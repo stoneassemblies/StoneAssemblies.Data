@@ -15,6 +15,8 @@ namespace StoneAssemblies.Data.Extensions
     using System.Reflection;
     using System.Threading.Tasks;
 
+    using Dasync.Collections;
+
     using Serilog;
 
     using StoneAssemblies.Data.Extensions.Interfaces;
@@ -29,6 +31,88 @@ namespace StoneAssemblies.Data.Extensions
         /// </summary>
         private static readonly ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>> PropertiesCache =
             new ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>>();
+
+        /// <summary>
+        ///     All async.
+        /// </summary>
+        /// <param name="dataReader">
+        ///     The data reader.
+        /// </param>
+        /// <param name="dataReaderOptions">
+        ///     The data reader options.
+        /// </param>
+        /// <typeparam name="TResponse">
+        ///     The response type.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="IAsyncEnumerable{TResponse}" />.
+        /// </returns>
+        public static async IAsyncEnumerable<TResponse> AllAsync<TResponse>(
+            this IDataReader dataReader, IDataReaderOptions dataReaderOptions = null)
+            where TResponse : new()
+        {
+            var responseType = typeof(TResponse);
+
+            var properties = PropertiesCache.GetOrAdd(
+                responseType,
+                type => type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance).ToDictionary(
+                    info => info.Name,
+                    StringComparer.InvariantCultureIgnoreCase));
+
+            if (await dataReader.ReadAsync())
+            {
+                var responseMessage = new TResponse();
+
+                var fieldIdx = 0;
+                var propertyIdx = 0;
+                while (fieldIdx < dataReader.FieldCount && propertyIdx < properties.Count)
+                {
+                    var fieldName = dataReader.GetName(fieldIdx);
+                    if (!await dataReader.IsDBNullAsync(fieldIdx) && properties.TryGetValue(fieldName, out var property))
+                    {
+                        if (property.IsReadableFromDatabase())
+                        {
+                            try
+                            {
+                                var value = dataReader.GetValue(fieldIdx);
+                                property.SetValue(responseMessage, value);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Warning(
+                                    ex,
+                                    "Error setting native value for {PropertyName} from data reader field {FieldName}",
+                                    property.Name,
+                                    fieldName);
+                            }
+                        }
+                        else if (dataReaderOptions?.DefaultHandler != null)
+                        {
+                            try
+                            {
+                                var fieldValue = dataReader.GetString(fieldIdx);
+                                var deserializedFieldValue = dataReaderOptions?.DefaultHandler(fieldValue, property.PropertyType);
+                                property.SetValue(responseMessage, deserializedFieldValue);
+                            }
+                            catch (Exception ex)
+                            {
+                                Log.Warning(
+                                    ex,
+                                    "Error deserializing for {PropertyName} from data reader column {FieldName} as JSON ",
+                                    property.Name,
+                                    fieldName);
+                            }
+                        }
+
+                        propertyIdx++;
+                    }
+
+                    fieldIdx++;
+                }
+
+                yield return responseMessage;
+            }
+        }
 
         /// <summary>
         ///     Checks whether is database value is null async.
@@ -91,68 +175,7 @@ namespace StoneAssemblies.Data.Extensions
             this IDataReader dataReader, IDataReaderOptions dataReaderOptions = null)
             where TResponse : new()
         {
-            var responseMessage = default(TResponse);
-            var responseType = typeof(TResponse);
-
-            var properties = PropertiesCache.GetOrAdd(
-                responseType,
-                type => type.GetProperties(BindingFlags.FlattenHierarchy | BindingFlags.Public | BindingFlags.Instance).ToDictionary(
-                    info => info.Name,
-                    StringComparer.InvariantCultureIgnoreCase));
-
-            if (await dataReader.ReadAsync())
-            {
-                responseMessage = new TResponse();
-
-                var fieldIdx = 0;
-                var propertyIdx = 0;
-                while (fieldIdx < dataReader.FieldCount && propertyIdx < properties.Count)
-                {
-                    var fieldName = dataReader.GetName(fieldIdx);
-                    if (!await dataReader.IsDBNullAsync(fieldIdx) && properties.TryGetValue(fieldName, out var property))
-                    {
-                        if (property.IsReadableFromDatabase())
-                        {
-                            try
-                            {
-                                var value = dataReader.GetValue(fieldIdx);
-                                property.SetValue(responseMessage, value);
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Warning(
-                                    ex,
-                                    "Error setting native value for {PropertyName} from data reader field {FieldName}",
-                                    property.Name,
-                                    fieldName);
-                            }
-                        }
-                        else if (dataReaderOptions?.DefaultHandler != null)
-                        {
-                            try
-                            {
-                                var fieldValue = dataReader.GetString(fieldIdx);
-                                var deserializedFieldValue = dataReaderOptions?.DefaultHandler(fieldValue, property.PropertyType);
-                                property.SetValue(responseMessage, deserializedFieldValue);
-                            }
-                            catch (Exception ex)
-                            {
-                                Log.Warning(
-                                    ex,
-                                    "Error deserializing for {PropertyName} from data reader column {FieldName} as JSON ",
-                                    property.Name,
-                                    fieldName);
-                            }
-                        }
-
-                        propertyIdx++;
-                    }
-
-                    fieldIdx++;
-                }
-            }
-
-            return responseMessage;
+            return await dataReader.AllAsync<TResponse>(dataReaderOptions).FirstAsync();
         }
     }
 }

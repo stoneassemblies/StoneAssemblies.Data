@@ -9,7 +9,7 @@ namespace StoneAssemblies.Data.SqlClient.Services
     using System.Data;
     using System.Data.SqlClient;
 
-    using StoneAssemblies.Data.Services;
+    using StoneAssemblies.Data.Services.Interfaces;
 
     /// <summary>
     ///     The SQL client connection factory.

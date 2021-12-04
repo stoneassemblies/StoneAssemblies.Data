@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace StoneAssemblies.Data.Services
+namespace StoneAssemblies.Data.Services.Interfaces
 {
     using System.Data;
 
