@@ -7,6 +7,7 @@ string[] OutputImages = System.Array.Empty<string>();
 
 string[] ComponentProjects  = new [] {
 	"./src/StoneAssemblies.Data/StoneAssemblies.Data.csproj",
+	"./src/StoneAssemblies.Data.SqlClient/StoneAssemblies.Data.SqlClient.csproj",
 };
 
 string TestProject = "src/StoneAssemblies.Data.Tests/StoneAssemblies.Data.Tests.csproj";
