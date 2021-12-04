@@ -1,5 +1,5 @@
 # StoneAssemblies.Data
-StoneAssemblies.Data extends the System.Data by providing useful extension methods to query your database as fast as [Dapper](https://dapper-tutorial.net/dapper) does ;)
+StoneAssemblies.Data extends the System.Data namespace by providing useful extension methods to query your database as fast as [Dapper](https://dapper-tutorial.net/dapper) does ;)
 
 ## Preliminary Benchmark Results
 
