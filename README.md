@@ -21,7 +21,7 @@ Intel Core i7-8750H CPU 2.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical 
 | **'StoneAssemblies.Data reading C'** |        **500**|   **570.04 ms** |  **8.628 ms** |   **8.070 ms** |   **569.36 ms** |
 |               'Dapper reading B' |        500 |   614.17 ms |  9.873 ms |   8.752 ms |   612.22 ms |
 | **'StoneAssemblies.Data reading B'** |        **500** |  **598.14 ms** |  **8.328 ms** |   **7.790 ms** |   **597.69 ms** |
-|               'Dapper reading A' |        500 |   624.50 ms |  8.224 ms |   9.471 ms |   623.71 ms |
+|               **'Dapper reading A'** |        **500** |   **624.50 ms** |  **8.224 ms** |   **9.471 ms** |   **623.71 ms** |
 | 'StoneAssemblies.Data reading A' |        500 |   660.26 ms |  8.780 ms |   7.784 ms |   656.28 ms |
 |               **'Dapper reading C'** |       **1000** | **1,183.65 ms** | **10.897 ms** |   **9.660 ms** | **1,183.97 ms** |
 | 'StoneAssemblies.Data reading C' |       1000 | 1,198.48 ms | 22.103 ms |  20.675 ms | 1,191.79 ms |
