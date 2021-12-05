@@ -15,11 +15,11 @@ develop | [![Build Status](https://dev.azure.com/alexfdezsauco/External%20Reposi
 Basic Usage
 -------------
 
-To read a single entity mapped from the reader result.
+To read a single entity mapped from the reader's output.
 
     var person = await dataReader.SingleAsync<Person>();
     
-To read all entities mapped from the reader result.
+To read all entities mapped from the reader's output.
 
     var persons = await dataReader.AllAsync<Person>().ToListAsync();
 
