@@ -142,6 +142,37 @@ namespace StoneAssemblies.Data.Tests.Extensions
             }
         }
 
+        private static void SetupMockFromExpectedResultButThrowsOnGetValue(object entity, Mock<IDataReader> dataReaderMock)
+        {
+            var propertyInfos = entity.GetType().GetProperties();
+            dataReaderMock.Setup(reader => reader.FieldCount).Returns(propertyInfos.Length);
+            for (var index = 0; index < propertyInfos.Length; index++)
+            {
+                var idx = index;
+                var propertyInfo = propertyInfos[idx];
+                dataReaderMock.Setup(reader => reader.GetName(idx)).Returns(propertyInfo.Name);
+                var value = propertyInfo.GetValue(entity);
+
+                if (value == null)
+                {
+                    dataReaderMock.Setup(reader => reader.IsDBNull(idx)).Returns(true);
+                }
+                else
+                {
+                    dataReaderMock.Setup(reader => reader.IsDBNull(idx)).Returns(false);
+
+                    if (propertyInfo.IsReadableFromDatabase())
+                    {
+                        dataReaderMock.Setup(reader => reader.GetValue(idx)).Throws(new Exception());
+                    }
+                    else
+                    {
+                        dataReaderMock.Setup(reader => reader.GetString(idx)).Throws(new Exception());
+                    }
+                }
+            }
+        }
+
         /// <summary>
         ///     The person.
         /// </summary>
@@ -267,7 +298,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
                 dataReaderMock.Setup(reader => reader.Read()).Returns(true);
 
-                SetupMockFromExpectedResult(entity, dataReaderMock);
+                SetupMockFromExpectedResultButThrowsOnGetValue(entity, dataReaderMock);
 
                 var makeGenericMethod = typeof(DataReaderExtensions).GetMethod(nameof(DataReaderExtensions.SingleAsync))
                     ?.MakeGenericMethod(entity.GetType());
