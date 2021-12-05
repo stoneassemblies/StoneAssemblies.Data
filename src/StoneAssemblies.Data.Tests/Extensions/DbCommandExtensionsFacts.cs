@@ -24,14 +24,30 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
     using Is = NUnit.DeepObjectCompare.Is;
 
-    /// <summary>
-    /// The database command extensions facts.
-    /// </summary>
     public class DbCommandExtensionsFacts
     {
-        /// <summary>
-        /// The the_ all async_ method.
-        /// </summary>
+        [TestFixture]
+        public class The_AddParameterWithValue_Method
+        {
+            [Test]
+            public void Adds_The_Specified_Parameter()
+            {
+                var commandMock = new Mock<IDbCommand>();
+                var dataParameterMock = new Mock<IDbDataParameter>();
+                commandMock.Setup(command => command.CreateParameter()).Returns(dataParameterMock.Object);
+                var dataParameterCollection = new Mock<IDataParameterCollection>();
+                commandMock.Setup(command => command.Parameters).Returns(dataParameterCollection.Object);
+
+                commandMock.Object.AddParameterWithValue("@param0", "paraValue");
+                dataParameterMock.VerifySet(parameter => parameter.ParameterName = "@param0");
+                dataParameterMock.VerifySet(parameter => parameter.Value = "paraValue");
+                dataParameterCollection.Verify(
+                    collection => collection.Add(It.Is<IDbDataParameter>(parameter => parameter == dataParameterMock.Object)),
+                    Times.Once);
+                dataParameterCollection.Verify(collection => collection.Add(It.IsAny<IDbDataParameter>()), Times.Once);
+            }
+        }
+
         [TestFixture]
         public class The_AllAsync_Method
         {
