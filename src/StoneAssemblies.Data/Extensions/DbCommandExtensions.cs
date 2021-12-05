@@ -6,6 +6,7 @@
 
 namespace StoneAssemblies.Data.Extensions
 {
+    using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
@@ -35,6 +36,40 @@ namespace StoneAssemblies.Data.Extensions
             uniqueReferenceParameter.ParameterName = parameterName;
             uniqueReferenceParameter.Value = value;
             command.Parameters.Add(uniqueReferenceParameter);
+        }
+
+        /// <summary>
+        ///     Gets all async.
+        /// </summary>
+        /// <param name="command">
+        ///     The command.
+        /// </param>
+        /// <param name="dataReaderOptions">
+        ///     The data reader options.
+        /// </param>
+        /// <typeparam name="TResponse">
+        ///     The response type.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="Task" />.
+        /// </returns>
+        public static async IAsyncEnumerable<TResponse> AllAsync<TResponse>(this IDbCommand command, IDataReaderOptions dataReaderOptions = null)
+            where TResponse : new()
+        {
+            IDataReader dataReader;
+            if (command is DbCommand dbCommand)
+            {
+                dataReader = await dbCommand.ExecuteReaderAsync();
+            }
+            else
+            {
+                dataReader = command.ExecuteReader();
+            }
+
+            await foreach (var response in dataReader.AllAsync<TResponse>(dataReaderOptions))
+            {
+                yield return response;
+            }
         }
 
         /// <summary>
@@ -90,7 +125,8 @@ namespace StoneAssemblies.Data.Extensions
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        public static async Task<TResponse> SingleAsync<TResponse>(this IDbCommand command, IDataReaderOptions dataReaderOptions = null)
+        public static async Task<TResponse> SingleAsync<TResponse>(
+            this IDbCommand command, IDataReaderOptions dataReaderOptions = null)
             where TResponse : new()
         {
             IDataReader dataReader;

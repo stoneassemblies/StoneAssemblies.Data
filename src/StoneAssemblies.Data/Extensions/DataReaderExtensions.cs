@@ -59,7 +59,7 @@ namespace StoneAssemblies.Data.Extensions
                     info => info.Name,
                     StringComparer.InvariantCultureIgnoreCase));
 
-            if (await dataReader.ReadAsync())
+            while (await dataReader.ReadAsync())
             {
                 var responseMessage = new TResponse();
 
