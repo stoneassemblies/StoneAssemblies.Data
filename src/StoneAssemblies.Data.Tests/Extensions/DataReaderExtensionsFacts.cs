@@ -111,7 +111,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                          };
         }
 
-        private static void SetupMockFromExpectedResult(object entity, Mock<IDataReader> dataReaderMock)
+        public static void SetupMockFromExpectedResult(object entity, Mock<IDataReader> dataReaderMock)
         {
             var propertyInfos = entity.GetType().GetProperties();
             dataReaderMock.Setup(reader => reader.FieldCount).Returns(propertyInfos.Length);
