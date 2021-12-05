@@ -60,7 +60,7 @@ namespace StoneAssemblies.Data.Extensions
             while (await dataReader.ReadAsync())
             {
                 var entity = new TEntity();
-                await dataReader.FillEntityAsync(entity, dataReaderOptions, properties);
+                await dataReader.FillEntityAsync(entity, properties, dataReaderOptions);
                 yield return entity;
             }
         }
@@ -138,16 +138,16 @@ namespace StoneAssemblies.Data.Extensions
         /// <param name="entity">
         ///     The object to be filled.
         /// </param>
-        /// <param name="dataReaderOptions">
-        ///     The data reader options.
-        /// </param>
         /// <param name="properties">
         ///     The properties.
+        /// </param>
+        /// <param name="dataReaderOptions">
+        ///     The data reader options.
         /// </param>
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        private static async Task FillEntityAsync(this IDataReader dataReader, object entity, IDataReaderOptions dataReaderOptions, Dictionary<string, PropertyInfo> properties)
+        private static async Task FillEntityAsync(this IDataReader dataReader, object entity, Dictionary<string, PropertyInfo> properties, IDataReaderOptions dataReaderOptions)
         {
             var fieldIdx = 0;
             var propertyIdx = 0;
