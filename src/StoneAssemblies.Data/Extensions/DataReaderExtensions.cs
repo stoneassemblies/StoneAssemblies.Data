@@ -60,7 +60,7 @@ namespace StoneAssemblies.Data.Extensions
             while (await dataReader.ReadAsync())
             {
                 var entity = new TEntity();
-                await dataReader.FillAsync(entity, dataReaderOptions, properties);
+                await dataReader.FillEntityAsync(entity, dataReaderOptions, properties);
                 yield return entity;
             }
         }
@@ -147,7 +147,7 @@ namespace StoneAssemblies.Data.Extensions
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        private static async Task FillAsync(this IDataReader dataReader, object entity, IDataReaderOptions dataReaderOptions, Dictionary<string, PropertyInfo> properties)
+        private static async Task FillEntityAsync(this IDataReader dataReader, object entity, IDataReaderOptions dataReaderOptions, Dictionary<string, PropertyInfo> properties)
         {
             var fieldIdx = 0;
             var propertyIdx = 0;
@@ -156,44 +156,67 @@ namespace StoneAssemblies.Data.Extensions
                 var fieldName = dataReader.GetName(fieldIdx);
                 if (!await dataReader.IsDBNullAsync(fieldIdx) && properties.TryGetValue(fieldName, out var property))
                 {
-                    if (property.IsReadableFromDatabase())
-                    {
-                        try
-                        {
-                            var value = dataReader.GetValue(fieldIdx);
-                            property.SetValue(entity, value);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Warning(
-                                ex,
-                                "Error setting native value for {PropertyName} from data reader field {FieldName}",
-                                property.Name,
-                                fieldName);
-                        }
-                    }
-                    else if (dataReaderOptions?.DefaultHandler != null)
-                    {
-                        try
-                        {
-                            var fieldValue = dataReader.GetString(fieldIdx);
-                            var deserializedFieldValue = dataReaderOptions?.DefaultHandler(fieldValue, property.PropertyType);
-                            property.SetValue(entity, deserializedFieldValue);
-                        }
-                        catch (Exception ex)
-                        {
-                            Log.Warning(
-                                ex,
-                                "Error deserializing for {PropertyName} from data reader column {FieldName} as JSON ",
-                                property.Name,
-                                fieldName);
-                        }
-                    }
-
+                    dataReader.FillEntityPropertyFromField(entity, property, fieldIdx, dataReaderOptions);
                     propertyIdx++;
                 }
 
                 fieldIdx++;
+            }
+        }
+
+        /// <summary>
+        ///     Fills entity property from data set field.
+        /// </summary>
+        /// <param name="dataReader">
+        ///     The data reader.
+        /// </param>
+        /// <param name="entity">
+        ///     The entity.
+        /// </param>
+        /// <param name="property">
+        ///     The property.
+        /// </param>
+        /// <param name="fieldIdx">
+        ///     The field index.
+        /// </param>
+        /// <param name="dataReaderOptions">
+        ///     The data reader options.
+        /// </param>
+        private static void FillEntityPropertyFromField(
+            this IDataReader dataReader, object entity, PropertyInfo property, int fieldIdx, IDataReaderOptions dataReaderOptions)
+        {
+            if (property.IsReadableFromDatabase())
+            {
+                try
+                {
+                    var value = dataReader.GetValue(fieldIdx);
+                    property.SetValue(entity, value);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(
+                        ex,
+                        "Error setting native value for {PropertyName} from data reader field {FieldIdx}",
+                        property.Name,
+                        fieldIdx);
+                }
+            }
+            else if (dataReaderOptions?.DefaultHandler != null)
+            {
+                try
+                {
+                    var fieldValue = dataReader.GetString(fieldIdx);
+                    var deserializedFieldValue = dataReaderOptions?.DefaultHandler(fieldValue, property.PropertyType);
+                    property.SetValue(entity, deserializedFieldValue);
+                }
+                catch (Exception ex)
+                {
+                    Log.Warning(
+                        ex,
+                        "Error deserializing for {PropertyName} from data reader field {FieldIdx} using default handler",
+                        property.Name,
+                        fieldIdx);
+                }
             }
         }
     }
