@@ -12,8 +12,19 @@ Branch | Status
 master | [![Build Status](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_apis/build/status/stoneassemblies.StoneAssemblies.Data?branchName=master)](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_build/latest?definitionId=15&branchName=master)
 develop | [![Build Status](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_apis/build/status/stoneassemblies.StoneAssemblies.Data?branchName=develop)](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_build/latest?definitionId=15&branchName=develop)
 
+Basic Usage
+-------------
 
-## Preliminary Benchmark Results
+To read a single entity mapped from from the reader result.
+
+    var person = await dataReader.SingleAsync<Person>();
+    
+To read all entities mapped from from the reader result.
+
+    var persons = await dataReader.AllAsync<Person>().ToListAsync();
+
+Preliminary Benchmark Results
+-----------------------------
 
 > BenchmarkDotNet=v0.13.1, OS=Windows 10.0.22000
 Intel Core i7-8750H CPU 2.20GHz (Coffee Lake), 1 CPU, 12 logical and 6 physical cores
