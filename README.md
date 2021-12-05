@@ -1,6 +1,18 @@
 # StoneAssemblies.Data
 StoneAssemblies.Data extends the System.Data namespace by providing useful extension methods to query your database as fast as [Dapper](https://dapper-tutorial.net/dapper) does ;)
 
+Build Status
+------------
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=StoneAssemblies.Data&metric=alert_status)](https://sonarcloud.io/dashboard?id=StoneAssemblies.Data)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=StoneAssemblies.Data&metric=ncloc)](https://sonarcloud.io/dashboard?id=StoneAssemblies.Data)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=StoneAssemblies.Data&metric=coverage)](https://sonarcloud.io/dashboard?id=StoneAssemblies.Data)
+
+Branch | Status
+------ | :------:
+master | [![Build Status](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_apis/build/status/stoneassemblies.StoneAssemblies.Data?branchName=master)](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_build/latest?definitionId=15&branchName=master)
+develop | [![Build Status](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_apis/build/status/stoneassemblies.StoneAssemblies.Data?branchName=develop)](https://dev.azure.com/alexfdezsauco/External%20Repositories%20Builds/_build/latest?definitionId=15&branchName=develop)
+
+
 ## Preliminary Benchmark Results
 
 > BenchmarkDotNet=v0.13.1, OS=Windows 10.0.22000
