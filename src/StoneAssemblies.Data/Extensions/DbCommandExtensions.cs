@@ -6,12 +6,10 @@
 
 namespace StoneAssemblies.Data.Extensions
 {
-    using System.Collections.Generic;
     using System.Data;
     using System.Data.Common;
+    using System.Threading;
     using System.Threading.Tasks;
-
-    using StoneAssemblies.Data.Extensions.Interfaces;
 
     /// <summary>
     ///     The database command extensions.
@@ -36,40 +34,6 @@ namespace StoneAssemblies.Data.Extensions
             uniqueReferenceParameter.ParameterName = parameterName;
             uniqueReferenceParameter.Value = value;
             command.Parameters.Add(uniqueReferenceParameter);
-        }
-
-        /// <summary>
-        ///     Gets all async.
-        /// </summary>
-        /// <param name="command">
-        ///     The command.
-        /// </param>
-        /// <param name="dataReaderOptions">
-        ///     The data reader options.
-        /// </param>
-        /// <typeparam name="TResponse">
-        ///     The response type.
-        /// </typeparam>
-        /// <returns>
-        ///     The <see cref="Task" />.
-        /// </returns>
-        public static async IAsyncEnumerable<TResponse> AllAsync<TResponse>(this IDbCommand command, IDataReaderOptions dataReaderOptions = null)
-            where TResponse : new()
-        {
-            IDataReader dataReader;
-            if (command is DbCommand dbCommand)
-            {
-                dataReader = await dbCommand.ExecuteReaderAsync();
-            }
-            else
-            {
-                dataReader = command.ExecuteReader();
-            }
-
-            await foreach (var response in dataReader.AllAsync<TResponse>(dataReaderOptions))
-            {
-                yield return response;
-            }
         }
 
         /// <summary>
@@ -111,35 +75,25 @@ namespace StoneAssemblies.Data.Extensions
         }
 
         /// <summary>
-        ///     The single async.
+        ///     This is the asynchronous version of ExecuteScalar().
         /// </summary>
         /// <param name="command">
         ///     The command.
         /// </param>
-        /// <param name="dataReaderOptions">
-        ///     The options.
+        /// <param name="cancellationToken">
+        ///     The cancellation token.
         /// </param>
-        /// <typeparam name="TResponse">
-        ///     The response type.
-        /// </typeparam>
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        public static async Task<TResponse> SingleAsync<TResponse>(
-            this IDbCommand command, IDataReaderOptions dataReaderOptions = null)
-            where TResponse : new()
+        public static async Task<object> ExecuteScalarAsync(this IDbCommand command, CancellationToken cancellationToken = default)
         {
-            IDataReader dataReader;
-            if (command is DbCommand dbCommand)
+            if (command is DbCommand dbConnection)
             {
-                dataReader = await dbCommand.ExecuteReaderAsync();
-            }
-            else
-            {
-                dataReader = command.ExecuteReader();
+                return await dbConnection.ExecuteScalarAsync(cancellationToken);
             }
 
-            return await dataReader.SingleAsync<TResponse>(dataReaderOptions);
+            return command.ExecuteScalar();
         }
     }
 }
