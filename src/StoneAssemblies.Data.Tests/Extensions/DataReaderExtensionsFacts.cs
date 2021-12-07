@@ -111,7 +111,16 @@ namespace StoneAssemblies.Data.Tests.Extensions
                          };
         }
 
-        public static void SetupMockFromExpectedResult(object entity, Mock<IDataReader> dataReaderMock)
+        /// <summary>
+        ///     Setups a mock from expected result.
+        /// </summary>
+        /// <param name="entity">
+        ///     The entity.
+        /// </param>
+        /// <param name="dataReaderMock">
+        ///     The data reader mock.
+        /// </param>
+        private static void SetupMockFromExpectedResult(object entity, Mock<IDataReader> dataReaderMock)
         {
             var propertyInfos = entity.GetType().GetProperties();
             dataReaderMock.Setup(reader => reader.FieldCount).Returns(propertyInfos.Length);
@@ -142,6 +151,15 @@ namespace StoneAssemblies.Data.Tests.Extensions
             }
         }
 
+        /// <summary>
+        ///     Setups mock from expected result but throws on get value.
+        /// </summary>
+        /// <param name="entity">
+        ///     The entity.
+        /// </param>
+        /// <param name="dataReaderMock">
+        ///     The data reader mock.
+        /// </param>
         private static void SetupMockFromExpectedResultButThrowsOnGetValue(object entity, Mock<IDataReader> dataReaderMock)
         {
             var propertyInfos = entity.GetType().GetProperties();
@@ -209,9 +227,21 @@ namespace StoneAssemblies.Data.Tests.Extensions
             public List<Person> Relatives { get; set; }
         }
 
+        /// <summary>
+        /// The all async method.
+        /// </summary>
         [TestFixture]
         public class The_AllAsync_Method
         {
+            /// <summary>
+            /// Returns all elements as expected.
+            /// </summary>
+            /// <param name="entity">
+            /// The entity.
+            /// </param>
+            /// <returns>
+            /// The <see cref="Task"/>.
+            /// </returns>
             [Test]
             [TestCaseSource(typeof(DataReaderExtensionsFacts), nameof(Entities))]
             public async Task Returns_All_Elements_As_Expected(object entity)
@@ -255,9 +285,21 @@ namespace StoneAssemblies.Data.Tests.Extensions
             }
         }
 
+        /// <summary>
+        /// The the_ single async_ method.
+        /// </summary>
         [TestFixture]
         public class The_SingleAsync_Method
         {
+            /// <summary>
+            /// Returns the expected result.
+            /// </summary>
+            /// <param name="entity">
+            /// The entity.
+            /// </param>
+            /// <returns>
+            /// The <see cref="Task"/>.
+            /// </returns>
             [Test]
             [TestCaseSource(typeof(DataReaderExtensionsFacts), nameof(Entities))]
             public async Task Returns_The_Expected_Result(object entity)
@@ -290,6 +332,15 @@ namespace StoneAssemblies.Data.Tests.Extensions
                 Assert.That(resultEntity, Is.DeepEqualTo(entity));
             }
 
+            /// <summary>
+            /// Succeeds even when read data from the database fails.
+            /// </summary>
+            /// <param name="entity">
+            /// The entity.
+            /// </param>
+            /// <returns>
+            /// The <see cref="Task"/>.
+            /// </returns>
             [Test]
             [TestCaseSource(typeof(DataReaderExtensionsFacts), nameof(Entities))]
             public async Task Succeeds_Even_When_Read_Data_From_DB_Fails(object entity)
