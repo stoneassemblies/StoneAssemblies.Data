@@ -6,6 +6,7 @@
 
 namespace StoneAssemblies.Data.SqlClient.Services
 {
+    using System;
     using System.Data;
 
     using Microsoft.Data.SqlClient;
@@ -15,7 +16,7 @@ namespace StoneAssemblies.Data.SqlClient.Services
     /// <summary>
     ///     The SQL client connection factory.
     /// </summary>
-    public class SqlConnectionFactory : IDbConnectionFactory
+    public class SqlConnectionFactory : IConnectionFactory
     {
         /// <summary>
         ///     Creates an <see cref="SqlConnection" />.
@@ -28,6 +29,11 @@ namespace StoneAssemblies.Data.SqlClient.Services
         /// </returns>
         public IDbConnection Create(string connectionString)
         {
+            if (string.IsNullOrWhiteSpace(connectionString))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(connectionString));
+            }
+
             return new SqlConnection(connectionString);
         }
     }
