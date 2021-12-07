@@ -13,7 +13,6 @@ namespace StoneAssemblies.Data.Extensions
     using System.Data.Common;
     using System.Linq;
     using System.Reflection;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using Dasync.Collections;
