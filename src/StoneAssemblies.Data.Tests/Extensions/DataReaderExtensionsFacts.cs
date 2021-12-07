@@ -516,6 +516,23 @@ namespace StoneAssemblies.Data.Tests.Extensions
             }
 
             /// <summary>
+            ///     Throws an exception when projection throws an exception and safety is false.
+            /// </summary>
+            [Test]
+            public void Throws_An_Exception_When_Projection_Throws_An_Exception_And_Safety_Is_False()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+                dataReaderMock.Setup(reader => reader.Read()).Returns(true);
+                dataReaderMock.Setup(reader => reader.GetString(0)).Throws<Exception>();
+                Assert.Throws<Exception>(
+                    () => dataReaderMock.Object.GetAll(
+                        reader => new Person
+                        {
+                            FirstName = reader.GetString(0),
+                        }).ToList());
+            }
+
+            /// <summary>
             ///     Returns empty enumeration when data reader read throws an exception.
             /// </summary>
             [Test]
