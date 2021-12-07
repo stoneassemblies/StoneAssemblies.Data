@@ -19,21 +19,55 @@ namespace StoneAssemblies.Data.Tests.Extensions
     using StoneAssemblies.Data.Extensions;
 
     /// <summary>
-    /// The database connection extensions facts.
+    ///     The database connection extensions facts.
     /// </summary>
     public class DbConnectionExtensionsFacts
     {
         /// <summary>
-        /// The dispose async method.
+        ///     The close async method.
+        /// </summary>
+        [TestFixture]
+        public class The_CloseAsync_Method
+        {
+            /// <summary>
+            ///     Calls open async.
+            /// </summary>
+            /// <returns>
+            ///     The <see cref="Task" />.
+            /// </returns>
+            [Test]
+            public async Task Calls_Close_Async()
+            {
+                var connectionMock = new Mock<IDbConnection>();
+                await connectionMock.Object.CloseAsync();
+                connectionMock.Verify(connection => connection.Close(), Times.Once);
+            }
+
+            /// <summary>
+            ///     Succeeds.
+            /// </summary>
+            /// <returns>
+            ///     The <see cref="Task" />.
+            /// </returns>
+            [Test]
+            public async Task Succeeds()
+            {
+                var connection = new SqlConnection() as IDbConnection;
+                await connection.CloseAsync();
+            }
+        }
+
+        /// <summary>
+        ///     The dispose async method.
         /// </summary>
         [TestFixture]
         public class The_DisposeAsync_Method
         {
             /// <summary>
-            /// Calls dispose async.
+            ///     Calls dispose async.
             /// </summary>
             /// <returns>
-            /// The <see cref="Task"/>.
+            ///     The <see cref="Task" />.
             /// </returns>
             [Test]
             public async Task Calls_Dispose_Once_Async()
@@ -62,7 +96,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
         }
 
         /// <summary>
-        /// The open async method.
+        ///     The open async method.
         /// </summary>
         [TestFixture]
         public class The_OpenAsync_Method
