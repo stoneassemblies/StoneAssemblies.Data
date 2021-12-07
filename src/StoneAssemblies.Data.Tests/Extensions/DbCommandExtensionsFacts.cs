@@ -70,6 +70,81 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
                 Assert.ThrowsAsync<InvalidOperationException>(() => command.ExecuteScalarAsync());
             }
+
+            /// <summary>
+            ///     Calls execute scalar and returns the expected value.
+            /// </summary>
+            /// <returns>
+            ///     The <see cref="Task" />.
+            /// </returns>
+            [Test]
+            public async Task Calls_ExecuteScalar_And_Returns_The_Expected_Value()
+            {
+                var commandMock = new Mock<IDbCommand>();
+                var expected = 1;
+                commandMock.Setup(command => command.ExecuteScalar()).Returns(expected);
+                var result = await commandMock.Object.ExecuteScalarAsync();
+                Assert.AreEqual(expected, result);
+            }
+
+        }
+
+        /// <summary>
+        ///     The execute reader async method.
+        /// </summary>
+        [TestFixture]
+        public class The_ExecuteReaderAsync_Method
+        {
+            /// <summary>
+            ///     Throws invalid operation exception because the underlying connection is closed.
+            /// </summary>
+            /// <returns>
+            ///     The <see cref="Task" />.
+            /// </returns>
+            [Test]
+            public async Task Throws_InvalidOperationException_Because_The_UnderlyingConnection_Is_Closed()
+            {
+                var command = new SqlCommand() as IDbCommand;
+
+                Assert.ThrowsAsync<InvalidOperationException>(() => command.ExecuteReaderAsync());
+            }
+        }
+
+        /// <summary>
+        ///     The  execute reader async generic method.
+        /// </summary>
+        [TestFixture]
+        public class The_ExecuteScalarAsync_Generic_Method
+        {
+            /// <summary>
+            ///     Throws invalid operation exception because the underlying connection is closed.
+            /// </summary>
+            /// <returns>
+            ///     The <see cref="Task" />.
+            /// </returns>
+            [Test]
+            public async Task Throws_InvalidOperationException_Because_The_UnderlyingConnection_Is_Closed()
+            {
+                var command = new SqlCommand() as IDbCommand;
+
+                Assert.ThrowsAsync<InvalidOperationException>(() => command.ExecuteScalarAsync<int>());
+            }
+
+            /// <summary>
+            ///     Calls execute scalar and returns the expected value.
+            /// </summary>
+            /// <returns>
+            ///     The <see cref="Task" />.
+            /// </returns>
+            [Test]
+            public async Task Calls_ExecuteScalar_And_Returns_The_Expected_Value()
+            {
+                var commandMock = new Mock<IDbCommand>();
+                var expected = 1;
+                commandMock.Setup(command => command.ExecuteScalar()).Returns(expected);
+                var result = await commandMock.Object.ExecuteScalarAsync<int>();
+                Assert.AreEqual(expected, result);
+            }
         }
     }
 }
