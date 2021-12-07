@@ -159,6 +159,18 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
                 Assert.Null(dataReader);
             }
+
+            /// <summary>
+            /// Throws an exception when execute reader throws an exception.
+            /// </summary>
+            [Test]
+            public void Throws_An_Exception_When__ExecuteReader_Throws_An_Exception()
+            {
+                var databaseCommandMock = new Mock<IDbCommand>();
+                databaseCommandMock.Setup(command => command.ExecuteReader()).Throws<Exception>();
+
+                Assert.Throws<Exception>(() => databaseCommandMock.Object.ExecuteReader(false));
+            }
         }
 
         /// <summary>
