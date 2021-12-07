@@ -124,7 +124,6 @@ namespace StoneAssemblies.Data.Tests.Extensions
                 var result = await commandMock.Object.ExecuteScalarAsync();
                 Assert.AreEqual(expected, result);
             }
-
         }
 
         /// <summary>
