@@ -13,6 +13,7 @@ namespace StoneAssemblies.Data.Extensions
     using System.Data.Common;
     using System.Linq;
     using System.Reflection;
+    using System.Threading;
     using System.Threading.Tasks;
 
     using Dasync.Collections;
@@ -33,7 +34,7 @@ namespace StoneAssemblies.Data.Extensions
             new ConcurrentDictionary<Type, Dictionary<string, PropertyInfo>>();
 
         /// <summary>
-        ///     All async.
+        ///     Gets all async.
         /// </summary>
         /// <param name="dataReader">
         ///     The data reader.
@@ -47,7 +48,7 @@ namespace StoneAssemblies.Data.Extensions
         /// <returns>
         ///     The <see cref="IAsyncEnumerable{TResponse}" />.
         /// </returns>
-        public static async IAsyncEnumerable<TEntity> AllAsync<TEntity>(
+        public static async IAsyncEnumerable<TEntity> GetAllAsync<TEntity>(
             this IDataReader dataReader, IDataReaderOptions dataReaderOptions = null)
             where TEntity : new()
         {
@@ -63,6 +64,75 @@ namespace StoneAssemblies.Data.Extensions
                 await dataReader.FillEntityAsync(entity, properties, dataReaderOptions);
                 yield return entity;
             }
+        }
+
+        /// <summary>
+        ///     Gets all async.
+        /// </summary>
+        /// <param name="dataReader">
+        ///     The data reader.
+        /// </param>
+        /// <param name="projection">
+        ///     The projection.
+        /// </param>
+        /// <typeparam name="TEntity">
+        ///     The entity type.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="IAsyncEnumerable" />.
+        /// </returns>
+        public static async IAsyncEnumerable<TEntity> GetAllAsync<TEntity>(
+            this IDataReader dataReader, Func<IDataReader, TEntity> projection)
+        {
+            while (await dataReader.ReadAsync())
+            {
+                var value = projection(dataReader);
+                yield return value;
+            }
+        }
+
+        /// <summary>
+        ///     Gets a single instance async.
+        /// </summary>
+        /// <param name="dataReader">
+        ///     The data reader.
+        /// </param>
+        /// <param name="projection">
+        ///     The projection.
+        /// </param>
+        /// <typeparam name="TEntity">
+        ///     The entity type.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="Task" />.
+        /// </returns>
+        public static async Task<TEntity> GetSingleAsync<TEntity>(this IDataReader dataReader, Func<IDataReader, TEntity> projection)
+            where TEntity : new()
+        {
+            return await dataReader.GetAllAsync(projection).FirstAsync();
+        }
+
+        /// <summary>
+        ///     Gets a single instance async.
+        /// </summary>
+        /// <param name="dataReader">
+        ///     The data reader.
+        /// </param>
+        /// <param name="dataReaderOptions">
+        ///     The options.
+        /// </param>
+        /// <typeparam name="TEntity">
+        ///     The entity type.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="Task" />.
+        ///     The task with the response.
+        /// </returns>
+        public static async Task<TEntity> GetSingleAsync<TEntity>(
+            this IDataReader dataReader, IDataReaderOptions dataReaderOptions = null)
+            where TEntity : new()
+        {
+            return await dataReader.GetAllAsync<TEntity>(dataReaderOptions).FirstAsync();
         }
 
         /// <summary>
@@ -107,29 +177,6 @@ namespace StoneAssemblies.Data.Extensions
         }
 
         /// <summary>
-        ///     Query single async.
-        /// </summary>
-        /// <param name="dataReader">
-        ///     The data reader.
-        /// </param>
-        /// <param name="dataReaderOptions">
-        ///     The options.
-        /// </param>
-        /// <typeparam name="TResponse">
-        ///     The response type.
-        /// </typeparam>
-        /// <returns>
-        ///     The <see cref="Task" />.
-        ///     The task with the response.
-        /// </returns>
-        public static async Task<TResponse> SingleAsync<TResponse>(
-            this IDataReader dataReader, IDataReaderOptions dataReaderOptions = null)
-            where TResponse : new()
-        {
-            return await dataReader.AllAsync<TResponse>(dataReaderOptions).FirstAsync();
-        }
-
-        /// <summary>
         ///     Fills the object async.
         /// </summary>
         /// <param name="dataReader">
@@ -147,7 +194,11 @@ namespace StoneAssemblies.Data.Extensions
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        private static async Task FillEntityAsync(this IDataReader dataReader, object entity, Dictionary<string, PropertyInfo> properties, IDataReaderOptions dataReaderOptions)
+        private static async Task FillEntityAsync(
+            this IDataReader dataReader,
+            object entity,
+            Dictionary<string, PropertyInfo> properties,
+            IDataReaderOptions dataReaderOptions)
         {
             var fieldIdx = 0;
             var propertyIdx = 0;
@@ -187,9 +238,9 @@ namespace StoneAssemblies.Data.Extensions
         {
             if (property.IsReadableFromDatabase())
             {
+                var value = dataReader.GetValue(fieldIdx);
                 try
                 {
-                    var value = dataReader.GetValue(fieldIdx);
                     property.SetValue(entity, value);
                 }
                 catch (Exception ex)
@@ -203,10 +254,11 @@ namespace StoneAssemblies.Data.Extensions
             }
             else if (dataReaderOptions?.DefaultHandler != null)
             {
+                var value = dataReader.GetValue(fieldIdx);
                 try
                 {
-                    var fieldValue = dataReader.GetString(fieldIdx);
-                    var deserializedFieldValue = dataReaderOptions?.DefaultHandler(fieldValue, property.PropertyType);
+                    var serializedValue = (string)value;
+                    var deserializedFieldValue = dataReaderOptions?.DefaultHandler(serializedValue, property.PropertyType);
                     property.SetValue(entity, deserializedFieldValue);
                 }
                 catch (Exception ex)

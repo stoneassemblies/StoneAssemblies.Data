@@ -6,6 +6,7 @@
 
 namespace StoneAssemblies.Data.Extensions
 {
+    using System;
     using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
@@ -33,6 +34,28 @@ namespace StoneAssemblies.Data.Extensions
             else
             {
                 connection.Close();
+            }
+        }
+
+        /// <summary>
+        ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources
+        ///     asynchronously.
+        /// </summary>
+        /// <param name="connection">
+        ///     The connection.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="Task" />.
+        /// </returns>
+        public static async Task DisposeAsync(this IDbConnection connection)
+        {
+            if (connection is IAsyncDisposable dbConnection)
+            {
+                await dbConnection.DisposeAsync();
+            }
+            else
+            {
+                connection.Dispose();
             }
         }
 

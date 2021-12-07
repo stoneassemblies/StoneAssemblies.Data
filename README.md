@@ -17,11 +17,11 @@ Basic Usage
 
 To read a single entity mapped from the reader's output.
 
-    var person = await dataReader.SingleAsync<Person>();
+    var person = await dataReader.GetSingleAsync<Person>();
     
 To read all entities mapped from the reader's output.
 
-    var persons = await dataReader.AllAsync<Person>().ToListAsync();
+    var persons = await dataReader.GetAllAsync<Person>().ToListAsync();
 
 Preliminary Benchmark Results
 -----------------------------

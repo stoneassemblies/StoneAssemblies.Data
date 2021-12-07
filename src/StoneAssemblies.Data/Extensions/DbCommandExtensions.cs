@@ -8,7 +8,6 @@ namespace StoneAssemblies.Data.Extensions
 {
     using System.Data;
     using System.Data.Common;
-    using System.Threading;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -80,20 +79,40 @@ namespace StoneAssemblies.Data.Extensions
         /// <param name="command">
         ///     The command.
         /// </param>
-        /// <param name="cancellationToken">
-        ///     The cancellation token.
-        /// </param>
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        public static async Task<object> ExecuteScalarAsync(this IDbCommand command, CancellationToken cancellationToken = default)
+        public static async Task<object> ExecuteScalarAsync(this IDbCommand command)
         {
             if (command is DbCommand dbConnection)
             {
-                return await dbConnection.ExecuteScalarAsync(cancellationToken);
+                return await dbConnection.ExecuteScalarAsync();
             }
 
             return command.ExecuteScalar();
+        }
+
+        /// <summary>
+        ///     This is the asynchronous and generic version of ExecuteScalar().
+        /// </summary>
+        /// <param name="command">
+        ///     The command.
+        /// </param>
+        /// <typeparam name="TResult">
+        ///     The result type.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="Task" />.
+        /// </returns>
+        public static async Task<TResult> ExecuteScalarAsync<TResult>(
+            this IDbCommand command)
+        {
+            if (command is DbCommand dbConnection)
+            {
+                return (TResult)await dbConnection.ExecuteScalarAsync();
+            }
+
+            return (TResult)command.ExecuteScalar();
         }
     }
 }

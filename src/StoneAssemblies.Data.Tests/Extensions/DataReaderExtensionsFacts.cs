@@ -10,9 +10,12 @@ namespace StoneAssemblies.Data.Tests.Extensions
     using System.Collections;
     using System.Collections.Generic;
     using System.Data;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Dasync.Collections;
+
+    using Microsoft.VisualBasic;
 
     using Moq;
 
@@ -21,6 +24,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
     using NUnit.Framework;
 
     using StoneAssemblies.Data.Extensions;
+    using StoneAssemblies.Data.Extensions.Interfaces;
     using StoneAssemblies.Data.Extensions.Options;
 
     using DataReaderExtensions = StoneAssemblies.Data.Extensions.DataReaderExtensions;
@@ -35,13 +39,13 @@ namespace StoneAssemblies.Data.Tests.Extensions
         {
             var random = new Random();
             yield return new Person
-                         {
-                             Id = Guid.NewGuid(),
-                             FirstName = Guid.NewGuid().ToString(),
-                             LastName = Guid.NewGuid().ToString(),
-                             Age = random.Next(100),
-                             BirthDay = DateTime.Now,
-                             Relatives = new List<Person>
+            {
+                Id = Guid.NewGuid(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                Age = random.Next(100),
+                BirthDay = DateTime.Now,
+                Relatives = new List<Person>
                                          {
                                              new Person
                                              {
@@ -68,23 +72,23 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  BirthDay = DateTime.Now,
                                              },
                                          },
-                         };
+            };
             yield return new Person
-                         {
-                             Id = Guid.NewGuid(),
-                             FirstName = Guid.NewGuid().ToString(),
-                             LastName = null,
-                             Age = random.Next(100),
-                             BirthDay = DateTime.Now,
-                             Relatives = null,
-                         };
+            {
+                Id = Guid.NewGuid(),
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = null,
+                Age = random.Next(100),
+                BirthDay = DateTime.Now,
+                Relatives = null,
+            };
             yield return new Person
-                         {
-                             FirstName = Guid.NewGuid().ToString(),
-                             LastName = Guid.NewGuid().ToString(),
-                             Age = random.Next(100),
-                             BirthDay = DateTime.Now,
-                             Relatives = new List<Person>
+            {
+                FirstName = Guid.NewGuid().ToString(),
+                LastName = Guid.NewGuid().ToString(),
+                Age = random.Next(100),
+                BirthDay = DateTime.Now,
+                Relatives = new List<Person>
                                          {
                                              new Person
                                              {
@@ -108,7 +112,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  BirthDay = DateTime.Now,
                                              },
                                          },
-                         };
+            };
         }
 
         /// <summary>
@@ -145,22 +149,13 @@ namespace StoneAssemblies.Data.Tests.Extensions
                     }
                     else
                     {
-                        dataReaderMock.Setup(reader => reader.GetString(idx)).Returns(JsonConvert.SerializeObject(value));
+                        dataReaderMock.Setup(reader => reader.GetValue(idx)).Returns(JsonConvert.SerializeObject(value));
                     }
                 }
             }
         }
 
-        /// <summary>
-        ///     Setups mock from expected result but throws on get value.
-        /// </summary>
-        /// <param name="entity">
-        ///     The entity.
-        /// </param>
-        /// <param name="dataReaderMock">
-        ///     The data reader mock.
-        /// </param>
-        private static void SetupMockFromExpectedResultButThrowsOnGetValue(object entity, Mock<IDataReader> dataReaderMock)
+        private static void SetupMockFromExpectedResultButWrongTypes(object entity, Mock<IDataReader> dataReaderMock)
         {
             var propertyInfos = entity.GetType().GetProperties();
             dataReaderMock.Setup(reader => reader.FieldCount).Returns(propertyInfos.Length);
@@ -181,11 +176,18 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
                     if (propertyInfo.IsReadableFromDatabase())
                     {
-                        dataReaderMock.Setup(reader => reader.GetValue(idx)).Throws(new Exception());
+                        if (value is string)
+                        {
+                            dataReaderMock.Setup(reader => reader.GetValue(idx)).Returns(1);
+                        }
+                        else
+                        {
+                            dataReaderMock.Setup(reader => reader.GetValue(idx)).Returns(value);
+                        }
                     }
                     else
                     {
-                        dataReaderMock.Setup(reader => reader.GetString(idx)).Throws(new Exception());
+                        dataReaderMock.Setup(reader => reader.GetValue(idx)).Returns(JsonConvert.SerializeObject(value));
                     }
                 }
             }
@@ -231,8 +233,54 @@ namespace StoneAssemblies.Data.Tests.Extensions
         /// The all async method.
         /// </summary>
         [TestFixture]
-        public class The_AllAsync_Method
+        public class The_GetAllAsync_Method
         {
+            /// <summary>
+            /// The returns_ the_ entity_ from_ the_ projection.
+            /// </summary>
+            /// <returns>
+            /// The <see cref="Task"/>.
+            /// </returns>
+            [Test]
+            public async Task Returns_All_Entities_From_The_Projection()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+                var setupSequentialResult = dataReaderMock.SetupSequence(reader => reader.Read());
+                var count = new Random().Next(10);
+                for (var i = 0; i < count; i++)
+                {
+                    setupSequentialResult = setupSequentialResult.Returns(true);
+                }
+
+                setupSequentialResult.Returns(false);
+
+                var expectedPerson = new Person
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = Guid.NewGuid().ToString(),
+                    LastName = Guid.NewGuid().ToString(),
+                };
+
+                dataReaderMock.Setup(reader => reader.GetGuid(0)).Returns(expectedPerson.Id);
+                dataReaderMock.Setup(reader => reader.GetString(1)).Returns(expectedPerson.FirstName);
+                dataReaderMock.Setup(reader => reader.GetString(2)).Returns(expectedPerson.LastName);
+
+                var persons = await dataReaderMock.Object.GetAllAsync(
+                                 reader => new Person
+                                 {
+                                     Id = reader.GetGuid(0),
+                                     FirstName = reader.GetString(1),
+                                     LastName = reader.GetString(2),
+                                 }).ToListAsync();
+
+                Assert.AreEqual(count, persons.Count);
+
+                foreach (var person in persons)
+                {
+                    Assert.That(person, Is.DeepEqualTo(expectedPerson));
+                }
+            }
+
             /// <summary>
             /// Returns all elements as expected.
             /// </summary>
@@ -259,7 +307,9 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
                 SetupMockFromExpectedResult(entity, dataReaderMock);
 
-                var makeGenericMethod = typeof(DataReaderExtensions).GetMethod(nameof(DataReaderExtensions.AllAsync))
+                var makeGenericMethod = typeof(DataReaderExtensions).GetMethods().FirstOrDefault(
+                        info => info.Name == nameof(DataReaderExtensions.GetAllAsync)
+                                && info.GetParameters()[1].ParameterType == typeof(IDataReaderOptions))
                     ?.MakeGenericMethod(entity.GetType());
 
                 var parameters = new object[]
@@ -289,8 +339,41 @@ namespace StoneAssemblies.Data.Tests.Extensions
         /// The the_ single async_ method.
         /// </summary>
         [TestFixture]
-        public class The_SingleAsync_Method
+        public class The_GetSingleAsync_Method
         {
+            /// <summary>
+            /// The returns_ the_ entity_ from_ the_ projection.
+            /// </summary>
+            /// <returns>
+            /// The <see cref="Task"/>.
+            /// </returns>
+            [Test]
+            public async Task Returns_The_Entity_From_The_Projection()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+                dataReaderMock.Setup(reader => reader.Read()).Returns(true);
+                var expectedPerson = new Person
+                {
+                    Id = Guid.NewGuid(),
+                    FirstName = Guid.NewGuid().ToString(),
+                    LastName = Guid.NewGuid().ToString(),
+                };
+
+                dataReaderMock.Setup(reader => reader.GetGuid(0)).Returns(expectedPerson.Id);
+                dataReaderMock.Setup(reader => reader.GetString(1)).Returns(expectedPerson.FirstName);
+                dataReaderMock.Setup(reader => reader.GetString(2)).Returns(expectedPerson.LastName);
+
+                var person = await dataReaderMock.Object.GetSingleAsync(
+                                 reader => new Person
+                                 {
+                                     Id = reader.GetGuid(0),
+                                     FirstName = reader.GetString(1),
+                                     LastName = reader.GetString(2),
+                                 });
+
+                Assert.That(person, Is.DeepEqualTo(expectedPerson));
+            }
+
             /// <summary>
             /// Returns the expected result.
             /// </summary>
@@ -309,7 +392,9 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
                 SetupMockFromExpectedResult(entity, dataReaderMock);
 
-                var makeGenericMethod = typeof(DataReaderExtensions).GetMethod(nameof(DataReaderExtensions.SingleAsync))
+                var makeGenericMethod = typeof(DataReaderExtensions).GetMethods().FirstOrDefault(
+                        info => info.Name == nameof(DataReaderExtensions.GetSingleAsync)
+                                && info.GetParameters()[1].ParameterType == typeof(IDataReaderOptions))
                     ?.MakeGenericMethod(entity.GetType());
 
                 var parameters = new object[]
@@ -343,22 +428,24 @@ namespace StoneAssemblies.Data.Tests.Extensions
             /// </returns>
             [Test]
             [TestCaseSource(typeof(DataReaderExtensionsFacts), nameof(Entities))]
-            public async Task Succeeds_Even_When_Read_Data_From_DB_Fails(object entity)
+            public async Task Succeeds_Even_When_Deserialization_Fails_Or_Propery_Types_Does_Not_Match(object entity)
             {
                 var dataReaderMock = new Mock<IDataReader>();
 
                 dataReaderMock.Setup(reader => reader.Read()).Returns(true);
 
-                SetupMockFromExpectedResultButThrowsOnGetValue(entity, dataReaderMock);
+                SetupMockFromExpectedResultButWrongTypes(entity, dataReaderMock);
 
-                var makeGenericMethod = typeof(DataReaderExtensions).GetMethod(nameof(DataReaderExtensions.SingleAsync))
+                var makeGenericMethod = typeof(DataReaderExtensions).GetMethods().FirstOrDefault(
+                        info => info.Name == nameof(DataReaderExtensions.GetSingleAsync)
+                                && info.GetParameters()[1].ParameterType == typeof(IDataReaderOptions))
                     ?.MakeGenericMethod(entity.GetType());
 
                 var parameters = new object[]
                                  {
                                      dataReaderMock.Object, new DataReaderOptions
                                                             {
-                                                                DefaultHandler = JsonConvert.DeserializeObject,
+                                                                DefaultHandler = (s, type) => throw new Exception(),
                                                             },
                                  };
 
