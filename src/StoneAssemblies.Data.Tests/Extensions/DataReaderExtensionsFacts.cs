@@ -157,6 +157,15 @@ namespace StoneAssemblies.Data.Tests.Extensions
             }
         }
 
+        /// <summary>
+        ///     Setup mock from expected result but wrong types.
+        /// </summary>
+        /// <param name="entity">
+        ///     The entity.
+        /// </param>
+        /// <param name="dataReaderMock">
+        ///     The data reader mock.
+        /// </param>
         private static void SetupMockFromExpectedResultButWrongTypes(object entity, Mock<IDataReader> dataReaderMock)
         {
             var propertyInfos = entity.GetType().GetProperties();
@@ -461,6 +470,104 @@ namespace StoneAssemblies.Data.Tests.Extensions
 
                 var resultEntity = invokeTask?.GetType()?.GetProperty("Result")?.GetValue(invokeTask);
                 Assert.NotNull(resultEntity);
+            }
+        }
+
+        /// <summary>
+        ///     The get all method.
+        /// </summary>
+        [TestFixture]
+        public class The_GetAll_Method
+        {
+            /// <summary>
+            /// Returns a nom empty enumeration when read does not throw an exception.
+            /// </summary>
+            [Test]
+            public void Returns_A_Nom_Empty_Enumeration_When_Read_Does_Not_Throw_An_Exception()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+
+                var count = 0;
+                dataReaderMock.Setup(reader => reader.Read()).Callback(() => count++).Returns(() => count < 2);
+                dataReaderMock.Setup(reader => reader.GetString(It.IsAny<int>())).Returns("string data");
+
+                var collection = dataReaderMock.Object.GetAll(reader => reader.GetString(0), true).ToList();
+
+                Assert.IsNotEmpty(collection);
+            }
+
+            /// <summary>
+            ///     Returns empty enumeration when projection throws an exception.
+            /// </summary>
+            [Test]
+            public void Returns_Empty_Enumeration_When_Projection_Throws_An_Exception()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+                dataReaderMock.Setup(reader => reader.Read()).Returns(true);
+                dataReaderMock.Setup(reader => reader.GetString(0)).Throws<Exception>();
+                var persons = dataReaderMock.Object.GetAll(
+                    reader => new Person
+                    {
+                        FirstName = reader.GetString(0),
+                    },
+                    true).ToList();
+
+                Assert.IsEmpty(persons);
+            }
+
+            /// <summary>
+            ///     Returns empty enumeration when data reader read throws an exception.
+            /// </summary>
+            [Test]
+            public void Returns_Empty_Enumeration_When_DataReader_Read_Throws_An_Exception()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+
+                dataReaderMock.Setup(reader => reader.Read()).Throws<Exception>();
+
+                var persons = dataReaderMock.Object.GetAll(
+                    reader => new Person
+                    {
+                        FirstName = reader.GetString(0),
+                    },
+                    true).ToList();
+
+                Assert.IsEmpty(persons);
+            }
+
+            /// <summary>
+            ///     Returns an empty enumeration when GetString throws an exception.
+            /// </summary>
+            [Test]
+            public void Returns_An_Empty_Enumeration_When_GetString_Throws_An_Exception()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+
+                var count = 0;
+                dataReaderMock.Setup(reader => reader.Read()).Callback(() => count++).Returns(() => count < 2);
+                dataReaderMock.Setup(reader => reader.GetString(It.IsAny<int>())).Throws<Exception>();
+
+                var collection = dataReaderMock.Object.GetAll(reader => reader.GetString(0), true).ToList();
+
+                Assert.IsEmpty(collection);
+            }
+
+            /// <summary>
+            ///     Throws exception when reader read throws an exception.
+            /// </summary>
+            [Test]
+            public void Throws_Exception_When_Reader_Read_Throws_An_Exception()
+            {
+                var dataReaderMock = new Mock<IDataReader>();
+
+                dataReaderMock.Setup(reader => reader.Read()).Throws<Exception>();
+
+                Assert.Throws<Exception>(
+                    () => dataReaderMock.Object.GetAll(
+                        reader => new Person
+                        {
+                            FirstName = reader.GetString(0),
+                        }).ToList());
             }
         }
     }

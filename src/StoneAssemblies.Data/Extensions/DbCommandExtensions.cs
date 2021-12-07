@@ -6,9 +6,12 @@
 
 namespace StoneAssemblies.Data.Extensions
 {
+    using System;
     using System.Data;
     using System.Data.Common;
     using System.Threading.Tasks;
+
+    using Serilog;
 
     /// <summary>
     ///     The database command extensions.
@@ -33,6 +36,38 @@ namespace StoneAssemblies.Data.Extensions
             uniqueReferenceParameter.ParameterName = parameterName;
             uniqueReferenceParameter.Value = value;
             command.Parameters.Add(uniqueReferenceParameter);
+        }
+
+        /// <summary>
+        ///     Execute reader safety.
+        /// </summary>
+        /// <param name="command">
+        ///     The command.
+        /// </param>
+        /// <param name="safety">
+        ///     Indicates if the execution will be safety.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="IDataAdapter" />.
+        /// </returns>
+        public static IDataReader ExecuteReader(this IDbCommand command, bool safety)
+        {
+            IDataReader dataReader = null;
+            try
+            {
+                dataReader = command.ExecuteReader();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error executing reader");
+
+                if (!safety)
+                {
+                    throw;
+                }
+            }
+
+            return dataReader;
         }
 
         /// <summary>
@@ -104,8 +139,7 @@ namespace StoneAssemblies.Data.Extensions
         /// <returns>
         ///     The <see cref="Task" />.
         /// </returns>
-        public static async Task<TResult> ExecuteScalarAsync<TResult>(
-            this IDbCommand command)
+        public static async Task<TResult> ExecuteScalarAsync<TResult>(this IDbCommand command)
         {
             if (command is DbCommand dbConnection)
             {

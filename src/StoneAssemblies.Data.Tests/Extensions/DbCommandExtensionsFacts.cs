@@ -127,6 +127,41 @@ namespace StoneAssemblies.Data.Tests.Extensions
         }
 
         /// <summary>
+        /// The execute reader_ method.
+        /// </summary>
+        [TestFixture]
+        public class The_ExecuteReader_Method
+        {
+            /// <summary>
+            ///     Returns a not null data reader when execute reader returns a not null data reader.
+            /// </summary>
+            [Test]
+            public void Returns_A_Not_Null_DataReader_When_ExecuteReader_Returns_A_Not_Null_DataReader()
+            {
+                var databaseCommandMock = new Mock<IDbCommand>();
+                databaseCommandMock.Setup(command => command.ExecuteReader()).Returns(Mock.Of<IDataReader>());
+
+                var dataReader = databaseCommandMock.Object.ExecuteReader(true);
+
+                Assert.NotNull(dataReader);
+            }
+
+            /// <summary>
+            ///     Returns a null data reader when execute reader throws an exception.
+            /// </summary>
+            [Test]
+            public void Returns_A_Null_DataReader_When_ExecuteReader_Throws_An_Exception()
+            {
+                var databaseCommandMock = new Mock<IDbCommand>();
+                databaseCommandMock.Setup(command => command.ExecuteReader()).Throws<Exception>();
+
+                var dataReader = databaseCommandMock.Object.ExecuteReader(true);
+
+                Assert.Null(dataReader);
+            }
+        }
+
+        /// <summary>
         ///     The execute reader async method.
         /// </summary>
         [TestFixture]

@@ -92,6 +92,82 @@ namespace StoneAssemblies.Data.Extensions
         }
 
         /// <summary>
+        ///     Reads the next record.
+        /// </summary>
+        /// <param name="dataReader">
+        ///     The data reader.
+        /// </param>
+        /// <param name="safety">
+        ///     Indicates whether will be a safety read.
+        /// </param>
+        /// <returns>
+        ///     The <see cref="bool" />.
+        /// </returns>
+        public static bool Read(this IDataReader dataReader, bool safety)
+        {
+            try
+            {
+                return dataReader.Read();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error reading the next record from data reader");
+
+                if (!safety)
+                {
+                    throw;
+                }
+
+                return false;
+            }
+        }
+
+        /// <summary>
+        ///     Selects records from data reader.
+        /// </summary>
+        /// <param name="dataReader">
+        ///     The data reader.
+        /// </param>
+        /// <param name="projection">
+        ///     The projection.
+        /// </param>
+        /// <param name="safety">
+        ///     Indicates whether the operation will be safe.
+        /// </param>
+        /// <typeparam name="TEntity">
+        ///     The result type.
+        /// </typeparam>
+        /// <returns>
+        ///     The <see cref="IEnumerable{TEntity}" />.
+        /// </returns>
+        public static IEnumerable<TEntity> GetAll<TEntity>(
+            this IDataReader dataReader, Func<IDataReader, TEntity> projection, bool safety = false)
+        {
+            while (dataReader.Read(safety))
+            {
+                TEntity value;
+
+                try
+                {
+                    value = projection(dataReader);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Error projecting from data reader");
+
+                    if (!safety)
+                    {
+                        throw;
+                    }
+
+                    yield break;
+                }
+
+                yield return value;
+            }
+        }
+
+        /// <summary>
         ///     Gets a single instance async.
         /// </summary>
         /// <param name="dataReader">
