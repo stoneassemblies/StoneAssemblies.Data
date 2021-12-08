@@ -16,12 +16,16 @@ namespace StoneAssemblies.Data.Services.Interfaces
         /// <summary>
         ///     Creates a database connection.
         /// </summary>
+        /// <typeparam name="TConnection">
+        ///     The connection type.
+        /// </typeparam>
         /// <param name="connectionString">
         ///     The connection string.
         /// </param>
         /// <returns>
         ///     The <see cref="IDbConnection" />.
         /// </returns>
-        IDbConnection Create(string connectionString);
+        IDbConnection Create<TConnection>(string connectionString)
+            where TConnection : IDbConnection;
     }
 }

@@ -24,13 +24,17 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="4.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
 		<PackageReference Include="Moq" Version="4.16.1" />
+		<PackageReference Include="MySqlConnector" Version="2.1.0" />
+		<PackageReference Include="Npgsql" Version="6.0.1" />
 		<PackageReference Include="NuGet.Protocol" Version="5.10.0" />
 		<PackageReference Include="NUnit" Version="3.13.2" />
 		<PackageReference Include="NUnit.DeepObjectCompare" Version="2.0.1" />
 		<PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.41" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -38,7 +42,6 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <ProjectReference Include="..\StoneAssemblies.Data.SqlClient\StoneAssemblies.Data.SqlClient.csproj" />
 	  <ProjectReference Include="..\StoneAssemblies.Data\StoneAssemblies.Data.csproj" />
 	</ItemGroup>
 
