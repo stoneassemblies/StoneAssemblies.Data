@@ -322,9 +322,11 @@ namespace StoneAssemblies.Data.Extensions
                 {
                     Log.Warning(
                         ex,
-                        "Error setting native value for {PropertyName} from data reader field {FieldIdx}",
+                        "Value of field {FieldIdx} of type {FieldType} from data reader cannot be assigned to {PropertyName} of type {PropertyType}",
+                        fieldIdx,
+                        value.GetType(),
                         property.Name,
-                        fieldIdx);
+                        property.PropertyType);
                 }
             }
             else if (dataReaderOptions?.DefaultHandler != null)

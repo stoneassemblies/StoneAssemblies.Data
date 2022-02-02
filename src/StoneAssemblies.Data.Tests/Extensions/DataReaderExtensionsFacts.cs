@@ -42,6 +42,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                 FirstName = Guid.NewGuid().ToString(),
                 LastName = Guid.NewGuid().ToString(),
                 Age = random.Next(100),
+                AnnualSalary = random.Next(1, 100),
                 BirthDay = DateTime.Now,
                 Relatives = new List<Person>
                                          {
@@ -52,6 +53,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  LastName = Guid.NewGuid().ToString(),
                                                  Age = random.Next(100),
                                                  BirthDay = DateTime.Now,
+                                                 AnnualSalary = random.Next(1, 100),
                                              },
                                              new Person
                                              {
@@ -60,6 +62,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  LastName = Guid.NewGuid().ToString(),
                                                  Age = random.Next(100),
                                                  BirthDay = DateTime.Now,
+                                                 AnnualSalary = random.Next(1, 100),
                                              },
                                              new Person
                                              {
@@ -68,6 +71,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  LastName = Guid.NewGuid().ToString(),
                                                  Age = random.Next(100),
                                                  BirthDay = DateTime.Now,
+                                                 AnnualSalary = random.Next(1, 100),
                                              },
                                          },
             };
@@ -79,6 +83,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                 Age = random.Next(100),
                 BirthDay = DateTime.Now,
                 Relatives = null,
+                AnnualSalary = random.Next(1, 100),
             };
             yield return new Person
             {
@@ -86,6 +91,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                 LastName = Guid.NewGuid().ToString(),
                 Age = random.Next(100),
                 BirthDay = DateTime.Now,
+                AnnualSalary = random.Next(1, 100),
                 Relatives = new List<Person>
                                          {
                                              new Person
@@ -94,6 +100,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  LastName = Guid.NewGuid().ToString(),
                                                  Age = random.Next(100),
                                                  BirthDay = DateTime.Now,
+                                                 AnnualSalary = random.Next(1, 100),
                                              },
                                              new Person
                                              {
@@ -101,6 +108,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  LastName = Guid.NewGuid().ToString(),
                                                  Age = random.Next(100),
                                                  BirthDay = DateTime.Now,
+                                                 AnnualSalary = random.Next(1, 100),
                                              },
                                              new Person
                                              {
@@ -108,6 +116,7 @@ namespace StoneAssemblies.Data.Tests.Extensions
                                                  LastName = Guid.NewGuid().ToString(),
                                                  Age = random.Next(100),
                                                  BirthDay = DateTime.Now,
+                                                 AnnualSalary = random.Next(1, 100),
                                              },
                                          },
             };
@@ -229,6 +238,11 @@ namespace StoneAssemblies.Data.Tests.Extensions
             ///     Gets or sets the last name.
             /// </summary>
             public string LastName { get; set; }
+
+            /// <summary>
+            /// Gets or sets the annual salary.
+            /// </summary>
+            public decimal AnnualSalary { get; set; }
 
             /// <summary>
             ///     Gets or sets the relatives.

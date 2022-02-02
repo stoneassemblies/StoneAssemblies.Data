@@ -26,6 +26,7 @@ namespace StoneAssemblies.Data.Extensions
         public static bool IsReadableFromDatabase(this PropertyInfo propertyInfo)
         {
             return propertyInfo.PropertyType.IsPrimitive || propertyInfo.PropertyType.IsEnum
+                                                         || propertyInfo.PropertyType == typeof(decimal)
                                                          || propertyInfo.PropertyType == typeof(string)
                                                          || propertyInfo.PropertyType == typeof(Guid)
                                                          || propertyInfo.PropertyType == typeof(TimeSpan)
