@@ -168,7 +168,8 @@ namespace StoneAssemblies.Data.Tests.Extensions
             [Test]
             public async Task Throws_InvalidOperationException_Because_The_UnderlyingConnection_Is_Closed()
             {
-                var command = new SqlCommand() as IDbCommand;
+                var sqlConnection = new SqlConnection();
+                var command = sqlConnection.CreateCommand() as IDbCommand;
 
                 Assert.ThrowsAsync<InvalidOperationException>(() => command.ExecuteReaderAsync());
             }
@@ -205,7 +206,8 @@ namespace StoneAssemblies.Data.Tests.Extensions
             [Test]
             public async Task Throws_InvalidOperationException_Because_The_UnderlyingConnection_Is_Closed()
             {
-                var command = new SqlCommand() as IDbCommand;
+                var sqlConnection = new SqlConnection();
+                var command = sqlConnection.CreateCommand() as IDbCommand;
 
                 Assert.ThrowsAsync<InvalidOperationException>(() => command.ExecuteScalarAsync<int>());
             }
@@ -242,7 +244,8 @@ namespace StoneAssemblies.Data.Tests.Extensions
             [Test]
             public async Task Throws_InvalidOperationException_Because_The_UnderlyingConnection_Is_Closed()
             {
-                var command = new SqlCommand() as IDbCommand;
+                var sqlConnection = new SqlConnection();
+                var command = sqlConnection.CreateCommand() as IDbCommand;
 
                 Assert.ThrowsAsync<InvalidOperationException>(() => command.ExecuteScalarAsync());
             }
