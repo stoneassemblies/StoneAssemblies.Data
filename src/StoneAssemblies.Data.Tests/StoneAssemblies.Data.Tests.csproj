@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFramework>net6.0</TargetFramework>
 		<IsPackable>false</IsPackable>
 	</PropertyGroup>
 
@@ -16,25 +16,25 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="coverlet.msbuild" Version="3.1.0">
+		<PackageReference Include="coverlet.msbuild" Version="6.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="coverlet.collector" Version="3.1.0">
+		<PackageReference Include="coverlet.collector" Version="6.0.0">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.Data.SqlClient" Version="4.0.1" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-		<PackageReference Include="Moq" Version="4.16.1" />
-		<PackageReference Include="MySqlConnector" Version="2.1.0" />
-		<PackageReference Include="Npgsql" Version="6.0.1" />
-		<PackageReference Include="NuGet.Protocol" Version="5.10.0" />
-		<PackageReference Include="NUnit" Version="3.13.2" />
+		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.1" />
+		<PackageReference Include="Moq" Version="4.18.4" />
+		<PackageReference Include="MySqlConnector" Version="2.2.6" />
+		<PackageReference Include="Npgsql" Version="7.0.4" />
+		<PackageReference Include="NuGet.Protocol" Version="6.6.0" />
+		<PackageReference Include="NUnit" Version="3.13.3" />
 		<PackageReference Include="NUnit.DeepObjectCompare" Version="2.0.1" />
-		<PackageReference Include="NUnit3TestAdapter" Version="4.1.0" />
-		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.41" />
+		<PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
+		<PackageReference Include="Oracle.ManagedDataAccess.Core" Version="3.21.100" />
 	</ItemGroup>
 	
 	<ItemGroup>
