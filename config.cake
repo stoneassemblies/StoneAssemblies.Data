@@ -11,5 +11,5 @@ string[] ComponentProjects  = new [] {
 
 string TestProject = "src/StoneAssemblies.Data.Tests/StoneAssemblies.Data.Tests.csproj";
 
-string SonarProjectKey = "StoneAssemblies.Data";
+string SonarProjectKey = "stoneassemblies_StoneAssemblies.Data";
 string SonarOrganization = "stoneassemblies";

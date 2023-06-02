@@ -3,9 +3,9 @@ StoneAssemblies.Data extends the System.Data namespace by providing useful exten
 
 Build Status
 ------------
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=StoneAssemblies.Data&metric=alert_status)](https://sonarcloud.io/dashboard?id=StoneAssemblies.Data)
-[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=StoneAssemblies.Data&metric=ncloc)](https://sonarcloud.io/dashboard?id=StoneAssemblies.Data)
-[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=StoneAssemblies.Data&metric=coverage)](https://sonarcloud.io/dashboard?id=StoneAssemblies.Data)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=stoneassemblies_StoneAssemblies.Data&metric=alert_status)](https://sonarcloud.io/dashboard?id=stoneassemblies_StoneAssemblies.Data)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=stoneassemblies_StoneAssemblies.Data&metric=ncloc)](https://sonarcloud.io/dashboard?id=stoneassemblies_StoneAssemblies.Data)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=stoneassemblies_StoneAssemblies.Data&metric=coverage)](https://sonarcloud.io/dashboard?id=stoneassemblies_StoneAssemblies.Data)
 
 Branch | Status
 ------ | :------:
